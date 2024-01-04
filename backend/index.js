@@ -13,7 +13,7 @@ const MONGODB_URI = "mongodb+srv://michelleMB:gg2089bi4rt5fghua@cluster0.1gqzafv
 const VERCEL_URL = process.env.VERCEL_URL || `http://localhost:${PORT}`;
 
 // Conexión a MongoDB
-mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(MONGODB_URI);
 
 app.use(express.json());
 app.use(cors());
