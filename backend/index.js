@@ -1,4 +1,4 @@
-const port = 4000;
+//const port = 4000; 
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -7,11 +7,19 @@ const multer = require("multer");
 const path = require("path");
 const cors = require("cors");
 
+// Configuración de variables de entorno
+const PORT = process.env.PORT || 4000;
+const MONGODB_URI = "mongodb+srv://michelleMB:gg2089bi4rt5fghua@cluster0.1gqzafv.mongodb.net/e-commerce"; //process.env.MONGODB_URI || "mongodb://localhost:27017/e-commerce";
+const VERCEL_URL = process.env.VERCEL_URL || `http://localhost:${PORT}`;
+
+// Conexión a MongoDB
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+
 app.use(express.json());
 app.use(cors());
 
 // Database Connection with MongoDB
-mongoose.connect("mongodb+srv://michelleMB:gg2089bi4rt5fghua@cluster0.1gqzafv.mongodb.net/e-commerce");
+//mongoose.connect("mongodb+srv://michelleMB:gg2089bi4rt5fghua@cluster0.1gqzafv.mongodb.net/e-commerce");
 
 // Api creation
 app.get("/",(req,res) => {
@@ -21,22 +29,34 @@ app.get("/",(req,res) => {
 //Image Storage Engine
 const storage = multer.diskStorage({
     destination: './upload/images',
+    filename: (req, file, cb) => {
+        return cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
+    }
+});
+/*const storage = multer.diskStorage({
+    destination: './upload/images',
     filename: (req,file,cb)=> {
         return cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`)
     }
-})
+})*/
 
 const upload = multer({storage:storage})
 
 // Creating Upload Endpoint for images
 app.use('/images', express.static('upload/images'))
 
-app.post("/upload", upload.single('product'), (req,res)=> {
+app.post("/upload", upload.single('product'), (req, res) => {
+    res.json({
+        success: 1,
+        image_url: `${VERCEL_URL}/images/${req.file.filename}`
+    });
+});
+/*app.post("/upload", upload.single('product'), (req,res)=> {
     res.json({
         success: 1,
         image_url: `http://localhost:${port}/images/${req.file.filename}`
     })
-})
+})*/
 
 // Schema for Creating Products
 const Product = mongoose.model("Product",{
@@ -253,10 +273,10 @@ app.post('/getcart',fetchUser,async (req, res)=>{
     res.json(userData.cartData);
 
 })
-
-app.listen(port,(error)=> {
+//port -> PORT
+app.listen(PORT,(error)=> {
     if(!error){
-        console.log("Server Running on Port " +port);
+        console.log("Server Running on Port " +PORT);
     }
     else{
         console.log("Error: " + error);
