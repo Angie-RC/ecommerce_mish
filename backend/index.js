@@ -30,7 +30,7 @@ const storage = multer.diskStorage({
     filename: (req, file, cb) => {
         return cb(null, `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`);
     }
-});
+})
 
 const upload = multer({storage:storage})
 
@@ -40,9 +40,9 @@ app.use('/images', express.static('upload/images'))
 app.post("/upload", upload.single('product'), (req, res) => {
     res.json({
         success: 1,
-        image_url: `${VERCEL_URL}/images/${req.file.filename}`
+        image_url: `/images/${req.file.filename}`
     });
-});
+})
 
 
 // Schema for Creating Products
